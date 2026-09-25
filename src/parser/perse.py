@@ -1,6 +1,6 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from enum import Enum
-
+from typing import Any
 
 class ZoneType(str, Enum):
     normal = 'normal'
@@ -19,17 +19,25 @@ class Hub(BaseModel):
     is_start: bool = Field(default=False)
     is_end: bool = Field(default=False)
 
+    @field_validator('name')
+    @staticmethod
+    def validate_name(value: str) -> str:
+        if "-" in value or " " in value:
+            raise ValueError(f"Invalid name '{value}'")
+        return value
+
 
 class Connection(BaseModel):
     from_hub: str
     to_hub: str
     max_link_capacity: int = Field(default=1, gt=0)
+# i should check that Hub name should not contain a space or -
 
 
 class Parser:
     def _parse_optional_part(self, optional_info: str) -> dict:
         """Parses the metadata brackets and returns a dict of kwargs."""
-        kwargs = {}
+        kwargs: dict[str, Any] = {}
         for part in optional_info.split():
             if "=" in part:
                 key, value = part.split("=", 1)

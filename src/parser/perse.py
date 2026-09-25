@@ -60,10 +60,20 @@ class Parser:
         else:
             base_info = line_data
         parts = base_info.strip().split()
+        try:
+            name=parts[0].strip()
+            if "-" in name:
+                raise ValueError(
+                    f"Parse Error: Hub name '{name}' \
+                          contains a dash.")
+            x=int(parts[1].strip())
+            y=int(parts[2].strip())
+        except Exception as err:
+            print(f"cought an error {err}")
         return Hub(
-            name=parts[0].strip(),
-            x=int(parts[1].strip()),
-            y=int(parts[2].strip()),
+            name=name,
+            x=x,
+            y=y,
             **kwargs,
             **flags
         )

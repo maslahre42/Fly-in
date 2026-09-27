@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, field_validator
 from enum import Enum
 from typing import Any
 
+
 class ZoneType(str, Enum):
     normal = 'normal'
     restricted = 'restricted'
@@ -31,7 +32,8 @@ class Connection(BaseModel):
     from_hub: str
     to_hub: str
     max_link_capacity: int = Field(default=1, gt=0)
-# i should check that Hub name should not contain a space or -
+# i should check that Hub name should not contain a space or - done
+# i should check that no repeted Hubs or Conection!
 
 
 class Parser:
@@ -52,7 +54,7 @@ class Parser:
 
     def _parse_hub_line(self, line_data: str, **flags) -> Hub:
         """Shared logic to create a Hub from a data string."""
-        kwargs = {}
+        kwargs: dict[str, Any] = {}
         if "[" in line_data and "]" in line_data:
             base_info, meta_info = line_data.split("[", 1)
             meta_string = meta_info.replace("]", "").strip()
@@ -60,26 +62,43 @@ class Parser:
         else:
             base_info = line_data
         parts = base_info.strip().split()
-        try:
-            name=parts[0].strip()
-            if "-" in name:
-                raise ValueError(
-                    f"Parse Error: Hub name '{name}' \
-                          contains a dash.")
-            x=int(parts[1].strip())
-            y=int(parts[2].strip())
-        except Exception as err:
-            print(f"cought an error {err}")
+        if len(parts) != 3:
+            raise ValueError(
+                f"Parse Error on '{base_info}': Expected exactly 3 parts "
+                f"(name, x, y). Ensure coordinates are present and the name"
+                f" contains NO spaces."
+            )
+        name = parts[0].strip()
+        if "-" in name:
+            raise ValueError(f"Parse Error: Hub name "
+                             f"'{name}' contains a dash.")
         return Hub(
             name=name,
-            x=x,
-            y=y,
+            x=int(parts[1]),
+            y=int(parts[2]),
             **kwargs,
             **flags
         )
 
-    def parse(self, filepath: str) -> tuple[list[Hub], int]:
+    def _conection_lines_sep(self, line: str) -> Connection:
+        capacity_str = "1"
+        if "[" in line and "]" in line:
+            base_info, meta_info = line.split("[", 1)
+            meta_string = meta_info.replace("]", "").strip()
+            if "max_link_capacity=" in meta_string:
+                capacity_str = meta_string.split("=")[1].strip()
+        else:
+            base_info = line
+        from_hub, to_hub = base_info.strip().split("-")
+        return Connection(
+            from_hub=from_hub.strip(),
+            to_hub=to_hub.strip(),
+            max_link_capacity=int(capacity_str)
+        )
+
+    def parse(self, filepath: str) -> tuple[list[Hub], list[Connection], int]:
         list_of_nodes: list[Hub] = []
+        list_of_conection: list[Connection] = []
         nb_drones = 0
         with open(filepath, "r") as file:
             for line in file:
@@ -99,4 +118,10 @@ class Parser:
                     hub_data = clean_line.split(":", 1)[1].strip()
                     list_of_nodes.append(self._parse_hub_line(
                         hub_data, is_end=True))
-        return list_of_nodes, nb_drones
+                elif clean_line.startswith("connection"):
+                    connection_data = clean_line.split(":", 1)[1].strip()
+                    list_of_conection.append(self._conection_lines_sep(
+                        connection_data
+                    ))
+
+        return list_of_nodes, list_of_conection, nb_drones

@@ -1,37 +1,7 @@
-from pydantic import BaseModel, Field, field_validator
-from enum import Enum
 from typing import Any
-
-
-class ZoneType(str, Enum):
-    normal = 'normal'
-    restricted = 'restricted'
-    priority = 'priority'
-    blocked = 'blocked'
-
-
-class Hub(BaseModel):
-    name: str
-    x: int
-    y: int
-    zone_type: ZoneType = Field(default=ZoneType.normal)
-    max_drones: int = Field(default=1, gt=0)
-    color: str = "none"
-    is_start: bool = Field(default=False)
-    is_end: bool = Field(default=False)
-
-    @field_validator('name')
-    @staticmethod
-    def validate_name(value: str) -> str:
-        if "-" in value or " " in value:
-            raise ValueError(f"Invalid name '{value}'")
-        return value
-
-
-class Connection(BaseModel):
-    from_hub: str
-    to_hub: str
-    max_link_capacity: int = Field(default=1, gt=0)
+from src.ZoneType import ZoneType
+from src.Connection import Connection
+from src.Hub import Hub
 # i should check that Hub name should not contain a space or - done
 # i should check that no repeted Hubs or Conection!
 

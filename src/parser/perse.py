@@ -1,9 +1,9 @@
 from typing import Any
-from src.ZoneType import ZoneType
-from src.Connection import Connection
-from src.Hub import Hub
+from src.model.ZoneType import ZoneType
+from src.model.Connection import Connection
+from src.model.Hub import Hub
 # i should check that Hub name should not contain a space or - done
-# i should check that no repeted Hubs or Conection!
+# i should check that no repeted Hubs or Conection! -done
 
 
 class Parser:
@@ -70,6 +70,10 @@ class Parser:
         list_of_nodes: list[Hub] = []
         list_of_conection: list[Connection] = []
         nb_drones = 0
+        seen_hubs = set()
+        seen_connections = set()
+        stup_check_start = False
+        stup_check_end = False
         with open(filepath, "r") as file:
             for line in file:
                 clean_line = line.split("#")[0].strip()
@@ -78,20 +82,40 @@ class Parser:
                 if clean_line.startswith("nb_drones:"):
                     nb_drones = int(clean_line.split(":", 1)[1].strip())
                 elif clean_line.startswith("start_hub:"):
+                    if stup_check_start:
+                        raise ValueError("error, we already had start hub!")
+                    stup_check_start = True
                     hub_data = clean_line.split(":", 1)[1].strip()
                     list_of_nodes.append(self._parse_hub_line(
                         hub_data, is_start=True))
                 elif clean_line.startswith("hub:"):
                     hub_data = clean_line.split(":", 1)[1].strip()
-                    list_of_nodes.append(self._parse_hub_line(hub_data))
+                    new_hub = self._parse_hub_line(hub_data)
+                    if new_hub.name in seen_hubs:
+                        raise ValueError(
+                            f"Parse Error: Duplicate hub name '{new_hub.name}' detected.")
+                    seen_hubs.add(new_hub)
+                    list_of_nodes.append(new_hub)
                 elif clean_line.startswith("end_hub:"):
+                    if stup_check_end:
+                        raise ValueError("error, we already had end hub!")
+                    stup_check_end = True
                     hub_data = clean_line.split(":", 1)[1].strip()
                     list_of_nodes.append(self._parse_hub_line(
                         hub_data, is_end=True))
                 elif clean_line.startswith("connection"):
                     connection_data = clean_line.split(":", 1)[1].strip()
-                    list_of_conection.append(self._conection_lines_sep(
+                    new_connection = self._conection_lines_sep(
                         connection_data
-                    ))
+                    )
+                    connection_pair = tuple(
+                        sorted(
+                            [new_connection.from_hub, new_connection.to_hub]))
+                    if connection_pair in seen_connections:
+                        raise ValueError(
+                            f"Parse Error: Duplicate connection between "
+                            f"{connection_pair[0]} and {connection_pair[1]}")
+                    seen_connections.add(connection_pair)
+                    list_of_conection.append(new_connection)
 
         return list_of_nodes, list_of_conection, nb_drones

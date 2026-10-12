@@ -86,23 +86,36 @@ class Parser:
                         raise ValueError("error, we already had start hub!")
                     stup_check_start = True
                     hub_data = clean_line.split(":", 1)[1].strip()
-                    list_of_nodes.append(self._parse_hub_line(
-                        hub_data, is_start=True))
+                    new_hub = self._parse_hub_line(
+                        hub_data, is_start=True)
+                    if new_hub.name in seen_hubs:
+                        raise ValueError(
+                            f"Parse Error: Duplicate hub name "
+                            f"'{new_hub.name}' detected.")
+                    seen_hubs.add(new_hub.name)
+                    list_of_nodes.append(new_hub)
                 elif clean_line.startswith("hub:"):
                     hub_data = clean_line.split(":", 1)[1].strip()
                     new_hub = self._parse_hub_line(hub_data)
                     if new_hub.name in seen_hubs:
                         raise ValueError(
-                            f"Parse Error: Duplicate hub name '{new_hub.name}' detected.")
-                    seen_hubs.add(new_hub)
+                            f"Parse Error: Duplicate hub name "
+                            f"'{new_hub.name}' detected.")
+                    seen_hubs.add(new_hub.name)
                     list_of_nodes.append(new_hub)
                 elif clean_line.startswith("end_hub:"):
                     if stup_check_end:
                         raise ValueError("error, we already had end hub!")
                     stup_check_end = True
                     hub_data = clean_line.split(":", 1)[1].strip()
-                    list_of_nodes.append(self._parse_hub_line(
-                        hub_data, is_end=True))
+                    new_hub = self._parse_hub_line(
+                        hub_data, is_end=True)
+                    if new_hub.name in seen_hubs:
+                        raise ValueError(
+                            f"Parse Error: Duplicate hub name "
+                            f"'{new_hub.name}' detected.")
+                    seen_hubs.add(new_hub.name)
+                    list_of_nodes.append(new_hub)
                 elif clean_line.startswith("connection"):
                     connection_data = clean_line.split(":", 1)[1].strip()
                     new_connection = self._conection_lines_sep(

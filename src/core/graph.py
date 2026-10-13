@@ -10,8 +10,8 @@ class Graph:
         self.adjacency_list: dict[str, list[str]] = {
             hub.name: [] for hub in hubs}
         self.connections_capacities: dict[tuple[str, str], int] = {}
-        self.start_hub: str | None = None
-        self.end_hub: str | None = None
+        self.start_hub: str = ""
+        self.end_hub: str = ""
         self._identify_terminals()
         self._build_graph(connections)
 
@@ -44,16 +44,21 @@ class Graph:
         """Returns the adjacent hubs for a given node."""
         return self.adjacency_list.get(hub_name, [])
 
+    def get_hub_type(self, hub_name: str) -> str:
+        """Rerturn the type of the hub"""
+        hubtype = self.hubs.get(hub_name)
+        return hubtype.zone_type
+
     def get_link_capacity(self, hub1: str, hub2: str) -> int:
         """Returns the edge capacity between two hubs, 0 if no link exists."""
         return self.connections_capacities.get((hub1, hub2), 0)
 
-    def get_node_capacity(self, hub_name: str) -> float:
+    def get_node_capacity(self, hub_name: str) -> int:
         """
         Returns the node capacity.
         """
         if hub_name == self.start_hub or hub_name == self.end_hub:
-            return float('inf')
+            return 2000000
         return self.hubs[hub_name].max_drones
 
     def get_distance(self, hub1_name: str, hub2_name: str) -> float:
@@ -61,3 +66,10 @@ class Graph:
         h1 = self.hubs[hub1_name]
         h2 = self.hubs[hub2_name]
         return hypot(h1.x - h2.x, h1.y - h2.y)
+
+    def get_coordinates(self, hub_name: str) -> tuple[int, int]:
+        """Returns the (x, y) coordinates of a specific hub."""
+        hub = self.hubs.get(hub_name)
+        if not hub:
+            raise KeyError(f"Graph Error: Hub '{hub_name}' does not exist.")
+        return (hub.x, hub.y)

@@ -46,7 +46,7 @@ class Graph:
 
     def get_hub_type(self, hub_name: str) -> str:
         """Rerturn the type of the hub"""
-        hubtype = self.hubs.get(hub_name)
+        hubtype = self.hubs[hub_name]
         return hubtype.zone_type
 
     def get_link_capacity(self, hub1: str, hub2: str) -> int:

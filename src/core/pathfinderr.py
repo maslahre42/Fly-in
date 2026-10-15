@@ -51,7 +51,8 @@ class pathfinderr:
                         queue_restricted.append((neighbor, new_path))
         return []
 
-    def calculate_the_capacity(self, path: list[tuple[str, int]]) -> tuple[int, int]:
+    def calculate_the_capacity(
+            self, path: list[tuple[str, int]]) -> tuple[int, int]:
         count_of_restricted_hubs = 0
         minimum = 2000000
         for i in range(len(path) - 1):

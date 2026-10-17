@@ -7,7 +7,7 @@ class Dron:
         self.id_dron = dron_id
         self.path = path
 
-    def location(self, current_turn: int ):
+    def location(self, current_turn: int):
         print(f"dron_id = {self.id_dron} now in {self.path[current_turn + 1]}")
 
 

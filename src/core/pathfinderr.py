@@ -63,6 +63,8 @@ class pathfinderr:
             hubtypee = self.graph.get_hub_type(hub)
             if hubtypee == ZoneType.restricted:
                 count_of_restricted_hubs += 1
+        if self.graph.get_hub_type(path[-1][0]) == ZoneType.restricted:
+            count_of_restricted_hubs += 1
         result_turns = (len(path) - 1) + count_of_restricted_hubs
         return result_turns, int(minimum)
 
@@ -79,18 +81,21 @@ class pathfinderr:
 
     def get_all_paths(self) -> list[dict]:
         all_found_paths = []
+        i = 0
         while True:
             path_tuples = self._solve_bfs()
             if not path_tuples:
                 break
-            turns, bottleneck = self.calculate_the_capacity(path_tuples)
+            cost, bottleneck = self.calculate_the_capacity(path_tuples)
             if bottleneck == 0:
                 break
             clean_path = [hub for hub, _ in path_tuples]
             all_found_paths.append({
+                "path_id": i,
                 "path": clean_path,
-                "turns": turns,
+                "cost_turns": cost,
                 "throughput": bottleneck
             })
+            i += 1
             self.graph_updeter(path_tuples, bottleneck)
         return all_found_paths

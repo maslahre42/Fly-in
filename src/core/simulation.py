@@ -1,15 +1,33 @@
-from src.core.pathfinderr import pathfinderr
 from src.core.graph import Graph
+from src.model.ZoneType import ZoneType
 
 
 class Dron:
-    def __init__(self, dron_id: int, path: list[str]):
+    def __init__(self, dron_id: int, path: list[str], start_turn: int, graph: Graph) -> None:
         self.id_dron = dron_id
         self.path = path
+        self.start_turn = start_turn
+        self._helper_for_restricted(graph)
 
-    def location(self, current_turn: int):
-        print(f"dron_id = {self.id_dron} now in {self.path[current_turn + 1]}")
+    def _helper_for_restricted(self, graph: Graph):
+        new_path = []
+        new_path.append(self.path[0])
+        for i in range(len(self.path) - 1):
+            hub = self.path[i]
+            next_hub = self.path[i+1]
+            hub_type = graph.get_hub_type(next_hub)
+            if hub_type == ZoneType.restricted:
+                new_path.append(f"{hub}-{next_hub}")
+            new_path.append(next_hub)
+        self.path = new_path
 
+    def location(self, current_turn: int) -> str | None:
+        if current_turn < self.start_turn:
+            return None
+        steps_done = current_turn - self.start_turn + 1
+        if steps_done >= len(self.path):
+            return None
+        return (f"D{self.id_dron}-{self.path[steps_done]}")
 
 
 class Simulation:
@@ -49,21 +67,24 @@ class Simulation:
     def simulation_try(self, numberof_drons: int):
         list_of_batches = self._assign_drones_to_paths(numberof_drons)
         list_of_drons: list[Dron] = []
-        turn = 1
         dron_count = 1
-        while dron_count < numberof_drons:
-            for row in list_of_batches:
-                if row["start_turn"] == turn:
-                    for _ in range(row["drones_in_this_batch"]):
-                        dron = Dron(dron_id=dron_count, path=row["path"])
-                        dron_count += 1
-                        list_of_drons.append(dron)
-                else:
-                    break
-            turn += 1
-        i = 1
-        while i < turn:
+        max_turn_needed = 0
+        for row in list_of_batches:
+            for _ in range(row["drones_in_this_batch"]):
+                dron = Dron(
+                    dron_id=dron_count,
+                    path=row["path"],
+                    start_turn=row["start_turn"],
+                    graph=self.graph)
+                list_of_drons.append(dron)
+                dron_count += 1
+                if row["arrival_turn"] > max_turn_needed:
+                    max_turn_needed = row["arrival_turn"]
+        for current_turn in range(1, max_turn_needed + 1):
+            turn_moves = []
             for dron in list_of_drons:
-                dron.location(i)
-
-
+                loc = dron.location(current_turn)
+                if loc:
+                    turn_moves.append(loc)
+            if turn_moves:
+                print(" ".join(turn_moves))

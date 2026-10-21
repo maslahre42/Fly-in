@@ -137,6 +137,19 @@ class Parser:
                     connection_pair = tuple(
                         sorted(
                             [new_connection.from_hub, new_connection.to_hub]))
+                    print(connection_pair)
+                    print(f"seen hubs = {seen_hubs}")
+                    print(new_connection)
+                    if (new_connection.from_hub not in seen_hubs):
+                        raise ValueError(
+                            f"Parse Error: {new_connection.from_hub} is "
+                            f"not define! in line{i} "
+                        )
+                    if (new_connection.to_hub not in seen_hubs):
+                        raise ValueError(
+                            f"Parse Error: {new_connection.to_hub} is "
+                            f"not define! in line{i} "
+                        )
                     if connection_pair in seen_connections:
                         raise ValueError(
                             f"Parse Error: Duplicate connection between "

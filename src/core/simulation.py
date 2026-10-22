@@ -1,5 +1,5 @@
 from src.core.graph import Graph
-from src.model.Dron import Dron
+from src.core.Dron import Dron
 
 
 class Simulation:

@@ -18,3 +18,11 @@ class Hub(BaseModel):
         if "-" in value or " " in value:
             raise ValueError(f"Invalid name '{value}'")
         return value
+
+    @field_validator('zone_type')
+    @staticmethod
+    def validate_zonetype(value: str) -> str:
+        if value == "normal" or value == "restricted" or \
+                value == "priority" or value == "blocked":
+            return value
+        raise ValueError(f"Invalid name '{value}'")

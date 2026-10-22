@@ -20,8 +20,15 @@ class Graph:
         for name, hub in self.hubs.items():
             if hub.is_start:
                 self.start_hub = name
+                if hub.zone_type == "blocked":
+                    raise ValueError(
+                        "the start cant be of type blocked!"
+                    )
             elif hub.is_end:
                 self.end_hub = name
+                if hub.zone_type == "blocked":
+                    raise ValueError(
+                        "the end cant be of type blocked!")
         if not self.start_hub or not self.end_hub:
             raise ValueError(
                 "Graph Error: Graph must have exactly \
@@ -32,8 +39,8 @@ class Graph:
             x = con.from_hub
             y = con.to_hub
             if x not in self.hubs or y not in self.hubs:
-                raise ValueError(f"Graph Error: Connection \
-                                  references missing hub '{x}' or '{y}'")
+                raise ValueError(f"Graph Error: Connection "
+                                 f"references missing hub '{x}' or '{y}'")
             if y not in self.adjacency_list[x]:
                 self.adjacency_list[x].append(y)
                 self.adjacency_list[y].append(x)

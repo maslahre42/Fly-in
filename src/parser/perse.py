@@ -105,7 +105,6 @@ class Parser:
                         continue
                     j += 1
                     if j == 1:
-                        print(clean_line.startswith("nb_drones:"))
                         if clean_line.startswith("nb_drones:"):
                             nb_drones_bool += 1
                             try:

@@ -32,4 +32,3 @@ class Dron:
         if steps_done >= len(self.path):
             return None
         return (f"D{self.id_dron}-{self.path[steps_done]}")
-

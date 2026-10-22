@@ -214,6 +214,8 @@ class Parser:
         except Exception as ex:
             str_number = str(line_number)
             errormessage = str(ex)
+            if line_number == 0:
+                raise ValueError(f"parsing error {ex}")
             if str_number in errormessage:
                 raise ValueError(f"parsing error {ex}")
             else:

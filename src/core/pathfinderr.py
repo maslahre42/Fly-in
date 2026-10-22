@@ -3,7 +3,7 @@ from collections import deque
 from model.ZoneType import ZoneType
 
 
-class pathfinderr:
+class Pathfinderr:
     def __init__(self, graph: Graph):
         self.graph = graph
         self.remaining_node_caps: dict[str, int] = {}

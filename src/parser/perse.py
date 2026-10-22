@@ -5,6 +5,9 @@ from src.model.Hub import Hub
 
 
 class Parser:
+    def __init__(self):
+        pass
+
     def _parse_optional_part(self, optional_info: str) -> dict:
         """Parses the metadata brackets and returns a dict of kwargs."""
         kwargs: dict[str, Any] = {}

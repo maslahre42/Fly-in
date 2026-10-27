@@ -6,11 +6,12 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "pydantic>=2.13.5",
+    "pygame>=2.6.1",
 ]
 
-[project.scripts]
-fly-in = "fly_in:main"
+[dependency-groups]
+dev = [
+    "flake8>=7.4.1",
+    "mypy>=1.10.0",
+]
 
-[build-system]
-requires = ["uv_build>=0.12.7,<0.13.0"]
-build-backend = "uv_build"

@@ -2,6 +2,7 @@ from src.core.graph import Graph
 from src.parser import Parser
 from src.core.simulation import Simulation
 from src.core.pathfinderr import Pathfinderr
+from ui.Visualiser import Visualizer
 
 import sys
 
@@ -24,7 +25,8 @@ def main() -> None:
     all_found_paths = path_finder.get_all_paths()
     simulation = Simulation(graph, all_found_paths)
     max_turn_needed = simulation.simulation_try(nb_drones)
-
+    viz = Visualizer(graph)
+    viz.run()
 
 if __name__ == "__main__":
     main()

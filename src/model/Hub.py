@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, field_validator
-from model.ZoneType import ZoneType
+from src.model.ZoneType import ZoneType
 
 
 class Hub(BaseModel):

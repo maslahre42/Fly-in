@@ -1,6 +1,6 @@
 from src.core.graph import Graph
 from collections import deque
-from model.ZoneType import ZoneType
+from src.model.ZoneType import ZoneType
 
 
 class Pathfinderr:

@@ -1,6 +1,6 @@
-PYTHON = uv run python
+PYTHON = uv run
 MAIN = main1.py
-MAP ?= maps/utf8_bom.txt
+MAP ?= maps/02_simple_fork.txt
 
 .PHONY: install run debug clean lint lint-strict all
 

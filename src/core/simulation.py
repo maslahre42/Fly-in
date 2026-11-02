@@ -38,7 +38,7 @@ class Simulation:
         list_of_batches.sort(key=lambda x: (x["start_turn"], x["path_id"]))
         return list_of_batches
 
-    def simulation_try(self, numberof_drons: int) -> int:
+    def simulation_try(self, numberof_drons: int) -> tuple[int, list[Dron]]:
         list_of_batches = self._assign_drones_to_paths(numberof_drons)
         list_of_drons: list[Dron] = []
         dron_count = 1
@@ -62,4 +62,4 @@ class Simulation:
                     turn_moves.append(loc)
             if turn_moves:
                 print(" ".join(turn_moves))
-        return max_turn_needed
+        return max_turn_needed, list_of_drons

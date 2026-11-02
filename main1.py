@@ -24,9 +24,10 @@ def main() -> None:
     path_finder = Pathfinderr(graph)
     all_found_paths = path_finder.get_all_paths()
     simulation = Simulation(graph, all_found_paths)
-    max_turn_needed = simulation.simulation_try(nb_drones)
-    viz = Visualizer(graph)
+    max_turn_needed, drones = simulation.simulation_try(nb_drones)
+    viz = Visualizer(graph, drones, max_turn_needed)
     viz.run()
+
 
 if __name__ == "__main__":
     main()

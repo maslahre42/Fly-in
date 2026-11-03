@@ -13,7 +13,7 @@ class Visualizer:
         self.max_turns = max_turns
         self.current_turn = 0
         pygame.init()
-        self.width, self.height = 1000, 700
+        self.width, self.height = 1980, 1080
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Drone Simulation")
         self.font = pygame.font.SysFont("Arial", 16)
@@ -69,25 +69,35 @@ class Visualizer:
     def draw_drons(self) -> None:
         color = (255, 255, 255)
         turn_text = self.font.render(
-            f"Turn: {self.current_turn} / {self.max_turns} ( Use LEFT / RIGHT arrows)",
+            f"Turn: {self.current_turn} / {self.max_turns} \
+                (Use LEFT / RIGHT arrows)",
             True,
             color,
         )
         self.screen.blit(turn_text, (20, 20))
+        drones_at_target: dict[str, list[int]] = {}
         for dron in self.drones:
             loc = dron.location(self.current_turn)
             if not loc:
                 continue
             target = loc.split("-", 1)[1]
+            if target not in drones_at_target:
+                drones_at_target[target] = []
+            drones_at_target[target].append(dron.id_dron)
+        for target, dron_ids in drones_at_target.items():
             if "-" not in target:
                 x, y = self.node_positions[target]
             else:
                 u, v = target.split("-")
                 x1, y1 = self.node_positions[u]
                 x2, y2 = self.node_positions[v]
-                x, y = (x1 + x2) // 2, (y2 + y1) // 2
-            pygame.draw.circle(self.screen,(color), (x, y), 10)
-            dron_label = self.font.render(f"D{dron.id_dron}", True, color)
+                x, y = (x1 + x2) // 2, (y1 + y2) // 2
+            pygame.draw.circle(self.screen, color, (x, y), 10)
+            if len(dron_ids) == 1:
+                text = f"D{dron_ids[0]}"
+            else:
+                text = f"x{len(dron_ids)}"
+            dron_label = self.font.render(text, True, color)
             self.screen.blit(dron_label, (x - 10, y + 12))
 
     def run(self) -> None:
@@ -97,7 +107,8 @@ class Visualizer:
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RIGHT and self.current_turn < self.max_turns:
+                    if event.key == pygame.K_RIGHT and \
+                          self.current_turn < self.max_turns:
                         self.current_turn += 1
                     elif event.key == pygame.K_LEFT and self.current_turn > 0:
                         self.current_turn -= 1

@@ -11,6 +11,7 @@ class Dron:
         self.id_dron = dron_id
         self.path = path
         self.start_turn = start_turn
+        self.graph = graph
         self._helper_for_restricted(graph)
 
     def _helper_for_restricted(self, graph: Graph):
@@ -25,7 +26,7 @@ class Dron:
             new_path.append(next_hub)
         self.path = new_path
 
-    def location(self, current_turn: int) -> str | None:
+    def location(self, current_turn: int) -> str:
         if current_turn < self.start_turn:
             return None
         steps_done = current_turn - self.start_turn + 1

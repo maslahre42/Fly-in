@@ -54,6 +54,11 @@ class Simulation:
                 dron_count += 1
                 if row["arrival_turn"] > max_turn_needed:
                     max_turn_needed = row["arrival_turn"]
+        return max_turn_needed, list_of_drons
+
+    def print_turns(
+        self, list_of_drons: list[Dron], max_turn_needed: int
+    ) -> None:
         for current_turn in range(1, max_turn_needed + 1):
             turn_moves = []
             for dron in list_of_drons:
@@ -62,4 +67,3 @@ class Simulation:
                     turn_moves.append(loc)
             if turn_moves:
                 print(" ".join(turn_moves))
-        return max_turn_needed, list_of_drons

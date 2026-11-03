@@ -1,6 +1,6 @@
 PYTHON = uv run
 MAIN = main1.py
-MAP ?= maps/02_simple_fork.txt
+MAP ?= maps/challenger/01_the_impossible_dream.txt
 
 .PHONY: install run debug clean lint lint-strict all
 

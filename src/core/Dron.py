@@ -28,8 +28,8 @@ class Dron:
 
     def location(self, current_turn: int) -> str:
         if current_turn < self.start_turn:
-            return None
+            return self.graph.start_hub
         steps_done = current_turn - self.start_turn + 1
         if steps_done >= len(self.path):
-            return None
+            return self.graph.end_hub
         return (f"D{self.id_dron}-{self.path[steps_done]}")

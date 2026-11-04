@@ -28,6 +28,9 @@ class Pathfinder:
         while queue:
             hub, path = queue.popleft()
             for neighbor in self.graph.get_neighbors(hub):
+                zone_type = self.graph.get_hub_type(neighbor)
+                if zone_type == ZoneType.blocked:
+                    continue
                 link_cap = self.remaining_link_caps.get((hub, neighbor), 0)
                 node_cap = self.remaining_node_caps.get(neighbor, 0)
                 if neighbor not in visited and link_cap > 0 and node_cap > 0:

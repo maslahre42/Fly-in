@@ -59,11 +59,13 @@ class Simulation:
     def print_turns(
         self, list_of_drons: list[Dron], max_turn_needed: int
     ) -> None:
+        status_drone = {dron: self.graph.start_hub for dron in list_of_drons}
         for current_turn in range(1, max_turn_needed + 1):
             turn_moves = []
             for dron in list_of_drons:
                 loc = dron.location(current_turn)
-                if loc:
+                if loc and status_drone[dron] != loc:
                     turn_moves.append(loc)
+                    status_drone[dron] = loc
             if turn_moves:
                 print(" ".join(turn_moves))

@@ -1,12 +1,16 @@
 PYTHON = uv run
-MAIN = main1.py
+MAIN = main.py
 MAP ?= maps/challenger/01_the_impossible_dream.txt
 
-.PHONY: install run debug clean lint lint-strict all
+.PHONY: all install run debug clean lint lint-strict
+
+all:
+	$(PYTHON) $(MAIN) $(MAP)
 
 install:
 	uv sync
-	
+
+
 run:
 	$(PYTHON) $(MAIN) $(MAP)
 
@@ -26,8 +30,3 @@ lint:
 lint-strict:
 	uv run flake8 .
 	uv run mypy . --strict
-
-all:
-	uv run flake8 .
-	uv run mypy . --strict
-	$(PYTHON) $(MAIN) $(MAP)

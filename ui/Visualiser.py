@@ -1,26 +1,40 @@
-import pygame
-from src.core.graph import Graph
-from src.model.ZoneType import ZoneType
-from src.core.Dron import Dron
+"""Pygame graphical visualizer for drone flight simulation."""
+
+import os
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+import pygame  # noqa: E402
+from src.core.graph import Graph  # noqa: E402
+from src.model.ZoneType import ZoneType  # noqa: E402
+from src.core.Dron import Dron  # noqa: E402
 
 
 class Visualizer:
+    """Interactive GUI visualizer rendering flight network and drone turns."""
+
     def __init__(
         self, graph: Graph, drones: list[Dron], max_turns: int
     ) -> None:
+        """Initialize the Pygame window and simulation state.
+
+        Args:
+            graph: Flight network graph.
+            drones: List of drones executing simulation schedules.
+            max_turns: Total number of turns in simulation.
+        """
         self.graph = graph
         self.drones = drones
         self.max_turns = max_turns
         self.current_turn = 0
         pygame.init()
-        self.width, self.height = 1920, 1080
+        self.width, self.height = 1280, 720
         self.screen = pygame.display.set_mode((self.width, self.height))
-        pygame.display.set_caption("Drone Simulation")
+        pygame.display.set_caption("Fly-in Drone Simulation Visualizer")
         self.font = pygame.font.SysFont("Arial", 16)
         self.node_positions: dict[str, tuple[int, int]] = {}
         self._generate_layout()
 
     def _generate_layout(self) -> None:
+        """Map hub Cartesian coordinates to window screen pixels."""
         if not self.graph.hubs:
             return
         all_coords = [
@@ -32,7 +46,7 @@ class Visualizer:
         max_y = max(coord[1] for coord in all_coords)
         map_width = max_x - min_x or 1
         map_height = max_y - min_y or 1
-        margin = 50
+        margin = 60
         usable_width = self.width - (2 * margin)
         usable_height = self.height - (2 * margin)
         scale_x = usable_width / map_width
@@ -44,6 +58,14 @@ class Visualizer:
             self.node_positions[name] = (screen_x, screen_y)
 
     def _get_hub_color(self, hub: str) -> pygame.Color:
+        """Determine display color based on hub type or custom color.
+
+        Args:
+            hub: Name of the hub.
+
+        Returns:
+            Pygame Color instance for rendering.
+        """
         custom_color = self.graph.hubs[hub].color
         if custom_color:
             try:
@@ -59,6 +81,7 @@ class Visualizer:
         return pygame.Color(70, 130, 180)
 
     def draw_map(self) -> None:
+        """Render connections and hub circles onto the screen."""
         self.screen.fill((30, 30, 40))
         for (u, v) in self.graph.connections_capacities.keys():
             if u in self.node_positions and v in self.node_positions:
@@ -74,10 +97,11 @@ class Visualizer:
             self.screen.blit(text, (pos[0] - 10, pos[1] - 30))
 
     def draw_drons(self) -> None:
+        """Render turn counter and current drone positions."""
         color = (255, 255, 255)
         turn_str = (
             f"Turn: {self.current_turn} / {self.max_turns} "
-            "(Use LEFT / RIGHT arrows)"
+            "(LEFT / RIGHT arrows to step)"
         )
         turn_text = self.font.render(turn_str, True, color)
         self.screen.blit(turn_text, (20, 20))
@@ -110,6 +134,7 @@ class Visualizer:
             self.screen.blit(dron_label, (x - 10, y + 12))
 
     def run(self) -> None:
+        """Run the interactive visualizer event loop."""
         running = True
         while running:
             for event in pygame.event.get():

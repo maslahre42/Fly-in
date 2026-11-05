@@ -1,8 +1,11 @@
+"""Data model representing a zone/hub in the graph network."""
 from pydantic import BaseModel, Field, field_validator
 from src.model.ZoneType import ZoneType
 
 
 class Hub(BaseModel):
+    """Represents a node/hub in the drone transit graph."""
+
     name: str
     x: int
     y: int
@@ -15,6 +18,7 @@ class Hub(BaseModel):
     @field_validator('name')
     @staticmethod
     def validate_name(value: str) -> str:
+        """Validate that hub names contain no dashes or spaces."""
         if "-" in value or " " in value:
             raise ValueError(f"Invalid name '{value}'")
         return value
@@ -22,7 +26,7 @@ class Hub(BaseModel):
     @field_validator('zone_type')
     @staticmethod
     def validate_zonetype(value: str) -> str:
-        if value == "normal" or value == "restricted" or \
-                value == "priority" or value == "blocked":
+        """Validate that the zone type is one of the supported types."""
+        if value in ("normal", "restricted", "priority", "blocked"):
             return value
         raise ValueError(f"Invalid name '{value}'")

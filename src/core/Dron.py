@@ -1,20 +1,25 @@
+"""Drone simulation entity managing path execution and transit state."""
 from src.core.graph import Graph
 from src.model.ZoneType import ZoneType
 
 
 class Dron:
+    """Represents an autonomous drone with an assigned route and start turn."""
+
     def __init__(
             self, dron_id: int,
             path: list[str],
             start_turn: int,
             graph: Graph) -> None:
+        """Initialize drone with identifier, route path, turn, and graph."""
         self.id_dron = dron_id
         self.path = path
         self.start_turn = start_turn
         self.graph = graph
         self._helper_for_restricted(graph)
 
-    def _helper_for_restricted(self, graph: Graph):
+    def _helper_for_restricted(self, graph: Graph) -> None:
+        """Insert intermediate connection hops for restricted zone transit."""
         new_path = []
         new_path.append(self.path[0])
         for i in range(len(self.path) - 1):
@@ -27,6 +32,7 @@ class Dron:
         self.path = new_path
 
     def location(self, current_turn: int) -> str:
+        """Return formatted location string for the current simulation turn."""
         if current_turn < self.start_turn:
             return self.graph.start_hub
         steps_done = current_turn - self.start_turn + 1

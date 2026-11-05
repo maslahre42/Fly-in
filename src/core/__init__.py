@@ -1,3 +1,5 @@
+"""Core algorithms, graph representation, and simulation modules."""
+
 from .pathfinderr import Pathfinderr
 from .pathfinder import Pathfinder
 from .simulation import Simulation

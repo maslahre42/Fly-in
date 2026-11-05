@@ -64,7 +64,7 @@ class Simulation:
             turn_moves = []
             for dron in list_of_drons:
                 loc = dron.location(current_turn)
-                if loc and status_drone[dron] != loc:
+                if loc and loc.startswith("D") and status_drone[dron] != loc:
                     turn_moves.append(loc)
                     status_drone[dron] = loc
             if turn_moves:

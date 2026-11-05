@@ -1,10 +1,20 @@
-from src.core.graph import Graph
+"""Breadth-first search pathfinding algorithm for drone flight paths."""
+
+from typing import Any
 from collections import deque
+from src.core.graph import Graph
 from src.model.ZoneType import ZoneType
 
 
 class Pathfinder:
-    def __init__(self, graph: Graph):
+    """Standard BFS pathfinder for computing paths in the flight graph."""
+
+    def __init__(self, graph: Graph) -> None:
+        """Initialize residual capacities for nodes and links in graph.
+
+        Args:
+            graph: Flight network graph with hubs and connections.
+        """
         self.graph = graph
         self.remaining_node_caps: dict[str, int] = {}
         for name, hub in graph.hubs.items():
@@ -16,6 +26,11 @@ class Pathfinder:
             tuple[str, str], int] = dict(graph.connections_capacities)
 
     def _solve_bfs(self) -> list[tuple[str, int]]:
+        """Find the shortest available path using residual capacities.
+
+        Returns:
+            List of (hub_name, capacity) tuples or empty list if no path.
+        """
         start_hub = self.graph.start_hub
         end_hub = self.graph.end_hub
         if start_hub == end_hub:
@@ -42,12 +57,21 @@ class Pathfinder:
         return []
 
     def calculate_the_capacity(
-            self, path: list[tuple[str, int]]) -> tuple[int, int]:
+        self, path: list[tuple[str, int]]
+    ) -> tuple[int, int]:
+        """Calculate effective transit turns and bottleneck throughput.
+
+        Args:
+            path: List of (hub_name, capacity) tuples.
+
+        Returns:
+            Tuple of (cost_turns, bottleneck_capacity).
+        """
         count_of_restricted_hubs = 0
         minimum = 2000000
         for i in range(len(path) - 1):
             hub, cap = path[i]
-            next_hub, next_cap = path[i+1]
+            next_hub, next_cap = path[i + 1]
             connection_cap = self.remaining_link_caps.get((hub, next_hub), 0)
             minimum = min(minimum, cap, next_cap, connection_cap)
             hubtypee = self.graph.get_hub_type(hub)
@@ -59,17 +83,30 @@ class Pathfinder:
         return result_turns, int(minimum)
 
     def graph_updeter(
-            self, path: list[tuple[str, int]], bottleneck: int) -> None:
+        self, path: list[tuple[str, int]], bottleneck: int
+    ) -> None:
+        """Deduct bottleneck capacity from traversed links and nodes.
+
+        Args:
+            path: List of (hub_name, capacity) tuples.
+            bottleneck: Capacity to deduct along the path.
+        """
         for i in range(len(path) - 1):
             u = path[i][0]
-            v = path[i+1][0]
+            v = path[i + 1][0]
             self.remaining_link_caps[(u, v)] -= bottleneck
             self.remaining_link_caps[(v, u)] -= bottleneck
         for hub, _ in path:
             if hub != self.graph.start_hub and hub != self.graph.end_hub:
                 self.remaining_node_caps[hub] -= bottleneck
 
-    def get_all_paths(self) -> list[dict]:
+    def get_all_paths(self) -> list[dict[str, Any]]:
+        """Find all viable augmenting paths and their bottleneck throughputs.
+
+        Returns:
+            List of path dictionaries containing path_id, path, cost_turns,
+            and throughput.
+        """
         all_found_paths = []
         i = 0
         while True:
@@ -84,7 +121,7 @@ class Pathfinder:
                 "path_id": i,
                 "path": clean_path,
                 "cost_turns": cost,
-                "throughput": bottleneck
+                "throughput": bottleneck,
             })
             i += 1
             self.graph_updeter(path_tuples, bottleneck)

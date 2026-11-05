@@ -1,10 +1,15 @@
-from src.core.graph import Graph
+"""Priority-aware multi-queue BFS pathfinder implementation."""
+from typing import Any
 from collections import deque
+from src.core.graph import Graph
 from src.model.ZoneType import ZoneType
 
 
 class Pathfinderr:
-    def __init__(self, graph: Graph):
+    """Finds bottleneck-capacity paths prioritizing fast flight zones."""
+
+    def __init__(self, graph: Graph) -> None:
+        """Initialize Pathfinderr with graph and track remaining capacities."""
         self.graph = graph
         self.remaining_node_caps: dict[str, int] = {}
         for name, hub in graph.hubs.items():
@@ -16,6 +21,7 @@ class Pathfinderr:
             tuple[str, str], int] = dict(graph.connections_capacities)
 
     def _solve_bfs(self) -> list[tuple[str, int]]:
+        """Perform multi-queue BFS search from start to end hub."""
         start_hub = self.graph.start_hub
         end_hub = self.graph.end_hub
         if start_hub == end_hub:
@@ -35,6 +41,9 @@ class Pathfinderr:
             else:
                 hub, path = queue_restricted.popleft()
             for neighbor in self.graph.get_neighbors(hub):
+                zone_type = self.graph.get_hub_type(neighbor)
+                if zone_type == ZoneType.blocked:
+                    continue
                 link_cap = self.remaining_link_caps.get((hub, neighbor), 0)
                 node_cap = self.remaining_node_caps.get(neighbor, 0)
                 if neighbor not in visited and link_cap > 0 and node_cap > 0:
@@ -42,7 +51,6 @@ class Pathfinderr:
                     if neighbor == end_hub:
                         return new_path
                     visited.add(neighbor)
-                    zone_type = self.graph.get_hub_type(neighbor)
                     if zone_type == ZoneType.priority:
                         queue_priority.append((neighbor, new_path))
                     elif zone_type == ZoneType.normal:
@@ -53,6 +61,7 @@ class Pathfinderr:
 
     def calculate_the_capacity(
             self, path: list[tuple[str, int]]) -> tuple[int, int]:
+        """Compute path turn duration and bottleneck throughput capacity."""
         count_of_restricted_hubs = 0
         minimum = 2000000
         for i in range(len(path) - 1):
@@ -70,6 +79,7 @@ class Pathfinderr:
 
     def graph_updeter(
             self, path: list[tuple[str, int]], bottleneck: int) -> None:
+        """Deduct bottleneck capacity from intermediate nodes and links."""
         for i in range(len(path) - 1):
             u = path[i][0]
             v = path[i+1][0]
@@ -79,7 +89,8 @@ class Pathfinderr:
             if hub != self.graph.start_hub and hub != self.graph.end_hub:
                 self.remaining_node_caps[hub] -= bottleneck
 
-    def get_all_paths(self) -> list[dict]:
+    def get_all_paths(self) -> list[dict[str, Any]]:
+        """Iteratively discover all capacity-accommodated paths."""
         all_found_paths = []
         i = 0
         while True:

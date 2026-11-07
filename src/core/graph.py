@@ -1,10 +1,14 @@
+"""Graph representation and network topology management for Fly-in."""
+from math import hypot
 from src.model.Connection import Connection
 from src.model.Hub import Hub
-from math import hypot
 
 
 class Graph:
-    def __init__(self, hubs: list[Hub], connections: list[Connection]):
+    """Represents the custom-built drone flight network graph."""
+
+    def __init__(self, hubs: list[Hub], connections: list[Connection]) -> None:
+        """Initialize graph with lists of Hub nodes and Connection edges."""
         self.hubs: dict[str, Hub] = {
             hub.name: hub for hub in hubs}
         self.adjacency_list: dict[str, list[str]] = {
@@ -16,7 +20,7 @@ class Graph:
         self._build_graph(connections)
 
     def _identify_terminals(self) -> None:
-        """Finds and stores the start and end hub names."""
+        """Find and store the unique start and end hub names."""
         for name, hub in self.hubs.items():
             if hub.is_start:
                 self.start_hub = name
@@ -31,10 +35,11 @@ class Graph:
                         "the end cant be of type blocked!")
         if not self.start_hub or not self.end_hub:
             raise ValueError(
-                "Graph Error: Graph must have exactly \
-                    one start and one end hub.")
+                "Graph Error: Graph must have exactly "
+                "one start and one end hub.")
 
     def _build_graph(self, connections: list[Connection]) -> None:
+        """Construct adjacency lists and bidirectional link capacities."""
         for con in connections:
             x = con.from_hub
             y = con.to_hub
@@ -48,34 +53,32 @@ class Graph:
             self.connections_capacities[(y, x)] = con.max_link_capacity
 
     def get_neighbors(self, hub_name: str) -> list[str]:
-        """Returns the adjacent hubs for a given node."""
+        """Return the adjacent hubs for a given node."""
         return self.adjacency_list.get(hub_name, [])
 
     def get_hub_type(self, hub_name: str) -> str:
-        """Rerturn the type of the hub"""
+        """Return the zone type of the given hub."""
         hubtype = self.hubs[hub_name]
         return hubtype.zone_type
 
     def get_link_capacity(self, hub1: str, hub2: str) -> int:
-        """Returns the edge capacity between two hubs, 0 if no link exists."""
+        """Return the edge capacity between two hubs, 0 if no link exists."""
         return self.connections_capacities.get((hub1, hub2), 0)
 
     def get_node_capacity(self, hub_name: str) -> int:
-        """
-        Returns the node capacity.
-        """
+        """Return the maximum drone capacity for a hub."""
         if hub_name == self.start_hub or hub_name == self.end_hub:
             return 2000000
         return self.hubs[hub_name].max_drones
 
     def get_distance(self, hub1_name: str, hub2_name: str) -> float:
-        """Calculates the Euclidean distance for A* heuristics."""
+        """Calculate the Euclidean distance between two hubs."""
         h1 = self.hubs[hub1_name]
         h2 = self.hubs[hub2_name]
         return hypot(h1.x - h2.x, h1.y - h2.y)
 
     def get_coordinates(self, hub_name: str) -> tuple[int, int]:
-        """Returns the (x, y) coordinates of a specific hub."""
+        """Return the (x, y) coordinates of a specific hub."""
         hub = self.hubs.get(hub_name)
         if not hub:
             raise KeyError(f"Graph Error: Hub '{hub_name}' does not exist.")

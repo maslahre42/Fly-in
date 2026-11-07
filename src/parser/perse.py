@@ -1,3 +1,4 @@
+"""Map file parser for the Fly-in simulation network."""
 from typing import Any
 from src.model.ZoneType import ZoneType
 from src.model.Connection import Connection
@@ -5,11 +6,14 @@ from src.model.Hub import Hub
 
 
 class Parser:
-    def __init__(self):
+    """Parses map files into Hubs, Connections, and drone fleet parameters."""
+
+    def __init__(self) -> None:
+        """Initialize a new Parser instance."""
         pass
 
-    def _parse_optional_part(self, optional_info: str) -> dict:
-        """Parses the metadata brackets and returns a dict of kwargs."""
+    def _parse_optional_part(self, optional_info: str) -> dict[str, Any]:
+        """Parse metadata inside brackets and return attribute dictionary."""
         kwargs: dict[str, Any] = {}
         for part in optional_info.split():
             if "=" in part:
@@ -32,8 +36,8 @@ class Parser:
         return kwargs
 
     def _parse_hub_line(
-            self, line_data: str, line_number: int, **flags) -> Hub:
-        """Shared logic to create a Hub from a data string."""
+            self, line_data: str, line_number: int, **flags: Any) -> Hub:
+        """Parse a hub data line into a validated Hub object."""
         kwargs: dict[str, Any] = {}
         if "[" in line_data and "]" in line_data:
             base_info, meta_info = line_data.split("[", 1)
@@ -64,6 +68,7 @@ class Parser:
             raise ValueError(f"line: {line_number}  hub_name:{name}\n {ex}")
 
     def _conection_lines_sep(self, line: str) -> Connection:
+        """Parse a connection string into a Connection object."""
         capacity_str = "1"
         if "[" in line and "]" in line:
             base_info, meta_info = line.split("[", 1)
@@ -89,6 +94,7 @@ class Parser:
             )
 
     def parse(self, filepath: str) -> tuple[list[Hub], list[Connection], int]:
+        """Parse map file into hubs, connections, and drone count."""
         list_of_nodes: list[Hub] = []
         list_of_conection: list[Connection] = []
         nb_drones = 0
@@ -211,6 +217,10 @@ class Parser:
                 raise ValueError(
                     f"number of the drons are missing or "
                     f"it is written mor than one time{nb_drones_bool}")
+            if not stup_check_start:
+                raise ValueError("Missing start_hub definition in map file")
+            if not stup_check_end:
+                raise ValueError("Missing end_hub definition in map file")
         except Exception as ex:
             str_number = str(line_number)
             errormessage = str(ex)

@@ -5,7 +5,7 @@ from src.core.graph import Graph
 from src.model.ZoneType import ZoneType
 
 
-class Pathfinderr:
+class Pathfinder_1:
     """Finds bottleneck-capacity paths prioritizing fast flight zones."""
 
     def __init__(self, graph: Graph) -> None:

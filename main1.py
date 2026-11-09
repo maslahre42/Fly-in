@@ -1,7 +1,7 @@
 from src.core.graph import Graph
 from src.parser import Parser
 from src.core.simulation import Simulation
-from src.core.pathfinderr import Pathfinderr
+from src.core.pathfinder_1 import Pathfinder_1
 from src.core.pathfinder import Pathfinder
 from ui.Visualiser import Visualizer
 import sys
@@ -22,7 +22,7 @@ def main() -> None:
             map_filepath)
         graph = Graph(list_of_nodes, list_of_conection)
 
-        path_finder = Pathfinderr(graph)
+        path_finder = Pathfinder_1(graph)
         all_found_paths = path_finder.get_all_paths()
         simulation = Simulation(graph, all_found_paths)
         max_turn_needed, drones = simulation.simulation_try(nb_drones)

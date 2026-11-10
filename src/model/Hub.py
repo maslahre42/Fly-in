@@ -10,7 +10,7 @@ class Hub(BaseModel):
     x: int
     y: int
     zone_type: ZoneType = Field(default=ZoneType.normal)
-    max_drones: int = Field(default=1, gt=0)
+    max_drones: int = Field(default=1, gt=0, le=2000000)
     color: str = "none"
     is_start: bool = Field(default=False)
     is_end: bool = Field(default=False)

@@ -67,8 +67,8 @@ class Graph:
 
     def get_node_capacity(self, hub_name: str) -> int:
         """Return the maximum drone capacity for a hub."""
-        if hub_name == self.start_hub or hub_name == self.end_hub:
-            return 2000000
+        # if hub_name == self.start_hub or hub_name == self.end_hub:
+        #     return 2000000
         return self.hubs[hub_name].max_drones
 
     def get_distance(self, hub1_name: str, hub2_name: str) -> float:

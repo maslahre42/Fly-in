@@ -100,7 +100,7 @@ class Simulation:
             list_of_drons: List of all instantiated drones.
             max_turn_needed: Maximum number of simulation turns.
         """
-        status_drone = {dron: self.graph.start_hub for dron in list_of_drons}
+        status_drone = {dron: dron.location(0) for dron in list_of_drons}
         for current_turn in range(1, max_turn_needed + 1):
             turn_moves = []
             for dron in list_of_drons:
